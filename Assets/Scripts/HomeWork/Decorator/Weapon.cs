@@ -1,14 +1,19 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace Asteroids.HomeWork.Decorator
 {
-    internal sealed class Weapon:IFire, IDestroy
+    internal sealed class Weapon:IFire
     {
         private Transform _barrelPosition;
         private IAmmunition _bullet;
         private float _force;
         private AudioClip _audioClip;
         private readonly AudioSource _audioSource;
+        public bool IsMuffler;
+        public bool IsAim;
+        public float RechargeTime = 0.1f;
 
         public Weapon(IAmmunition bullet, Transform barrelPosition, float force, AudioSource audioSource, AudioClip audioClip)
         {
@@ -17,6 +22,7 @@ namespace Asteroids.HomeWork.Decorator
             _force = force;
             _audioSource = audioSource;
             _audioClip = audioClip;
+            IsMuffler = false;
         }
 
         public void SetBarrelPosition(Transform barrelPosition)
@@ -39,16 +45,17 @@ namespace Asteroids.HomeWork.Decorator
             _audioClip = audioClip;
         }
 
+        public AudioClip GetAudioClip()
+        {
+            return _audioClip;
+        }
+
         public void Fire()
         {
             var bullet = Object.Instantiate(_bullet.BulletInstance, _barrelPosition.position, Quaternion.identity);
             bullet.AddForce(_barrelPosition.forward * _force);
             Object.Destroy(bullet.gameObject, _bullet.TimeToDestroy);
             _audioSource.PlayOneShot(_audioClip);
-        }
-
-        public void Destroy()
-        {
         }
     }
 }
